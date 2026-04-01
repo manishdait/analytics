@@ -337,8 +337,6 @@ def plot_stacked_bar(
             _annotate_bar_totals(ax, patches, totals, horizontal=True)
         ax.margins(y=HORIZONTAL_Y_MARGIN, x=HORIZONTAL_X_MARGIN)
         ax.set_xlim(0, _compute_horizontal_axis_limit(max_total, padding))
-        legend_anchor = (0.5, -0.04)
-        bottom_rect = 0.05
     else:
         if annotate_totals and len(df) <= 12:
             _annotate_bar_totals(ax, patches, totals, horizontal=False)
@@ -347,14 +345,26 @@ def plot_stacked_bar(
         if is_numeric_or_datetime(df[x_col]) and (df[x_col] % 1 == 0).all():
             ax.set_xticks(df[x_col])
             ax.set_xticklabels([str(int(v)) for v in df[x_col]])
-        legend_anchor = (0.5, -0.14)
-        bottom_rect = 0.14
 
+    ## Adaptive Legend placement
+    labels_count = len(labels)
     legend_loc = "lower center"
+    legend_anchor = (0.5, -0.14)
+    layout_rect = (0, 0.14, 1.0, 1.0)
+    legend_ncol = min(labels_count, 4)
+
+    if labels_count > 6:
+        legend_loc = "upper left"
+        legend_anchor = (1.02, 1.0)
+        layout_rect = (0, 0, 0.85, 1.0)
+        legend_ncol = 1
+
+    # Backward-compatible override.
     if legend_inside_bottom_right:
         legend_loc = "lower right"
         legend_anchor = (0.985, 0.02)
-        bottom_rect = 0.0
+        layout_rect = (0, 0, 1.0, 1.0)
+        legend_ncol = min(labels_count, 4)
 
     finalize_chart(
         fig=fig,
@@ -370,7 +380,7 @@ def plot_stacked_bar(
         legend_labels=labels,
         legend_loc=legend_loc,
         legend_bbox_to_anchor=legend_anchor,
-        legend_ncol=min(len(labels), 4),
+        legend_ncol=legend_ncol,
         legend_kwargs={"borderaxespad": 0.0},
-        layout_rect=(0, bottom_rect, 1, 1.0),
+        layout_rect=layout_rect,
     )

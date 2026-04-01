@@ -180,6 +180,20 @@ def plot_multiline(
     ax.set_xlim(float(pivot.index.min()) - 0.15, float(pivot.index.max()) + 0.45)
     ax.margins(x=0.03, y=0.16)
 
+    legend_count = len(pivot.columns)
+
+    ## Prefer Bottom legend, Right legend only when many items
+    if legend_count > 6:
+        legend_loc = "upper left"
+        legend_bbox_to_anchor = (1.02, 1.0)
+        legend_ncol = 1
+        layout_rect = (0, 0, 0.85, 1.0)
+    else:
+        legend_loc = "lower center"
+        legend_bbox_to_anchor = (0.5, -0.18)
+        legend_ncol = min(legend_count, 4)
+        layout_rect = (0, 0.12, 1.0, 1.0)
+
     finalize_chart(
         fig=fig,
         ax=ax,
@@ -190,10 +204,9 @@ def plot_multiline(
         legend=True,
         rotate_x=rotate_x,
         grid_axis="y",
-        # Keep the legend in the header whitespace instead of on top of data.
-        legend_loc="upper right",
-        legend_bbox_to_anchor=(1, 1.14),
-        legend_ncol=min(len(pivot.columns), 3),
+        legend_loc=legend_loc,
+        legend_bbox_to_anchor=legend_bbox_to_anchor,
+        legend_ncol=legend_ncol,
         legend_kwargs={"borderaxespad": 0.0},
-        layout_rect=(0, 0, 1, 0.92),
+        layout_rect=layout_rect,
     )
